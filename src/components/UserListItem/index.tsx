@@ -1,36 +1,38 @@
+import { observer } from 'mobx-react-lite';
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Button, Item, Segment } from 'semantic-ui-react';
+import { Button, Icon, Item, Segment } from 'semantic-ui-react';
 import IUser from '../../models/IUser';
 
 interface Props {
   user: IUser;
 }
 
-export default function UserListItem({ user }: Props) {
+function UserListItem({ user }: Props) {
+  
   return (
     <Segment.Group>
       <Segment>
         <Item.Group>
           <Item>
-            <Item.Image size="tiny" />
+            <Icon name="user" circular />
             <Item.Content>
-              <Item.Header as={Link} to={`/teams/${user.id}`}>
+              <Item.Header as={Link} to={`/users/${user.id}`}>
                 {user.displayName}
               </Item.Header>
+              <Button
+                as={Link}
+                to={`/users/${user.id}`}
+                color="teal"
+                floated="right"
+                content="View"
+              />
             </Item.Content>
           </Item>
         </Item.Group>
       </Segment>
-      <Segment clearing>
-        <Button
-          as={Link}
-          to={`/users/${user.id}`}
-          color="teal"
-          floated="right"
-          content="View"
-        />
-      </Segment>
     </Segment.Group>
   );
 }
+
+export default observer(UserListItem);

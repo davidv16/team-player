@@ -8,7 +8,7 @@ import NavBar from '../components/NavBar';
 import Users from '../views/Users';
 import TeamDetail from '../views/TeamDetail';
 import { useStore } from '../stores/store';
-// import TeamDetail from '../views/TeamDetail';
+import UserDetail from '../views/UserDetail';
 
 function App() {
   return (
@@ -20,10 +20,11 @@ function App() {
           <Route path="/teams" element={<Teams />} />
           <Route path="/teams/:id" element={<TeamDetail />} />
           <Route path="/users" element={<Users />} />
+          <Route path="/users/:id" element={<UserDetail />} />
         </Routes>
       </Container>
     </>
   );
 }
 
-export default observer(App);
+export default App;

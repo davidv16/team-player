@@ -7,20 +7,20 @@ import { useStore } from '../../stores/store';
 
 function Users() {
   const { teamUserStore } = useStore();
-  const {loadingInitial, users } = teamUserStore;
+  const {loadingInitial, teamRegistry, userRegistry, loadTeams, loadUsers, usersSorted } = teamUserStore;
 
-  /*
   useEffect(() => {
+    if (teamRegistry.size <= 1) loadTeams();
     if (userRegistry.size <= 1) loadUsers();
-  }, [userRegistry.size, loadUsers]);
-*/
+}, [teamRegistry.size, loadTeams, userRegistry.size, loadUsers]);
+
   // checks if the frontend is loading before it renders the Loading component
   if (loadingInitial) return <LoadingComponent content="Loading app" />;
 
   return (
     <Grid>
       <Grid.Column>
-        <UserList users={users} />
+        <UserList users={usersSorted} />
       </Grid.Column>
     </Grid>
   );

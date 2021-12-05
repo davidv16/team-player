@@ -1,4 +1,5 @@
 import { makeAutoObservable, runInAction } from 'mobx';
+import { convertTypeAcquisitionFromJson } from 'typescript';
 import ITeam from '../models/ITeam';
 import ITeamDetail from '../models/ITeamDetail';
 import IUser from '../models/IUser';
@@ -8,9 +9,11 @@ import services from '../services';
 export default class TeamUserStore {
   teamRegistry = new Map<string, ITeam>();
   userRegistry = new Map<string, IUser>();
+  teamMembers = new Map<string, IUser>();
 
   selectedTeam: ITeamDetail | undefined = undefined;
-  selectedUser: IUser | undefined;
+  selectedUser: IUserDetail | undefined = undefined;
+  teamLeader: IUser | undefined = undefined;
   // editMode = false;
   // loading = false;
 
@@ -21,6 +24,13 @@ export default class TeamUserStore {
     makeAutoObservable(this);
   }
 
+  get teamMembersSorted() {
+    return Array.from(
+      this.teamMembers.values()
+    ).sort(((a, b) => (
+      (a.displayName > b.displayName) ? 1 : ((b.displayName > a.displayName) ? -1 : 0)
+    )));
+  }
   get teamsSorted() {
     return Array.from(
       this.teamRegistry.values()
@@ -29,33 +39,13 @@ export default class TeamUserStore {
     )));
   }
 
-  get users() {
+  get usersSorted() {
     return Array.from(
       this.userRegistry.values()
     ).sort(((a, b) => (
       (a.displayName > b.displayName) ? 1 : ((b.displayName > a.displayName) ? -1 : 0)
     )));
   }
-
-  getTeamUsers = (ids: string[]) => {
-    const teamUsers: IUser[] = [];
-
-    runInAction(() => {
-      for (const id of ids) {
-        teamUsers.push(this.getUser(id) as IUser);
-      }
-    });
-    return this.sortUser(teamUsers);
-  }
-
-  getUserById = (id: string) => {
-    console.log(id)
-    let user;
-    runInAction(() => {
-      user = this.getUser(id);
-    });
-    return user;
-  };
 
   sortUser = (users: IUser[]) => {
     return users.sort(((a, b) => (
@@ -132,6 +122,8 @@ export default class TeamUserStore {
     if (team) {
       // set the team to the selected team
       this.selectedTeam = team;
+      this.teamLeader = this.getUser(team.teamLeadId);
+      this.setTeamMembers(team.teamMemberIds);
       // ensures we return a promise that is either team or undefined
       return team;
     }
@@ -147,6 +139,8 @@ export default class TeamUserStore {
       runInAction(() => {
         // set the team to the selected team
         this.selectedTeam = team;
+        this.teamLeader = this.getUser(team.teamLeadId);
+        this.setTeamMembers(team.teamMemberIds);
       });
       // set the loading symbol to false
       this.setLoadingInitial(false);
@@ -157,14 +151,17 @@ export default class TeamUserStore {
       // set the loading symbol to false
       this.setLoadingInitial(false);
     }
-    console.log(team.teamLeadId);
-    //this.selectedUser = this.getUserById(team.teamLeadId);
     return team as ITeamDetail;
   };
 
 
+  private setTeamMembers = (ids: string[]) => {
+    ids.forEach((id) => {
+      this.teamMembers.set(id, this.getUser(id) as IUser);
+    });
+  }
+
   private setUser = (user: IUser) => {
-    //this.userRegistry.set(user.id, user);
     this.userRegistry.set(user.id, user);
   };
 
@@ -176,6 +173,10 @@ export default class TeamUserStore {
   private setTeam = (team: ITeam) => {
     this.teamRegistry.set(team.id, team);
   };
+
+  private setTeamMember = (user: IUser) => {
+    this.teamMembers.set(user.id, user);
+  }
 
   private getTeam = (id: string) => {
     return this.teamRegistry.get(id);
