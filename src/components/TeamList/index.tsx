@@ -1,28 +1,19 @@
-import React, { useState, Fragment, useEffect } from 'react';
-import ITeam from '../../models/ITeam';
-import dummyTeam from '../../resources/dummyTeam.json';
+import React from 'react';
+import { observer } from 'mobx-react-lite';
 import TeamListItem from '../TeamListItem';
-import * as teamService from '../../services/TeamService';
+import { useStore } from '../../stores/store';
 
-export default function TeamList() {
-  const [teams, setTeams] = useState<ITeam[]>(dummyTeam);
+function TeamList() {
+  const { teamUserStore } = useStore();
+  const { teamsSorted } = teamUserStore;
 
-  useEffect(() => {
-    (async () => {
-      teamService.getTeams().then((response) => {
-        const teamImport: ITeam[] = [];
-        response.forEach((team) => {
-          teamImport.push(team);
-        });
-        setTeams(teamImport);
-      });
-    })();
-  }, []);
   return (
     <>
-      {teams.map((team) => (
+      {teamsSorted.map((team) => (
         <TeamListItem key={team.id} team={team} />
       ))}
     </>
   );
 }
+
+export default observer(TeamList);

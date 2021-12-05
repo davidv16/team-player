@@ -1,13 +1,13 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button, Item, Segment } from 'semantic-ui-react';
-import ITeam from '../../models/ITeam';
+import IUser from '../../models/IUser';
 
 interface Props {
-  team: ITeam;
+  user: IUser;
 }
 
-export default function UserListItem({ team }: Props) {
+export default function UserListItem({ user }: Props) {
   return (
     <Segment.Group>
       <Segment>
@@ -15,8 +15,8 @@ export default function UserListItem({ team }: Props) {
           <Item>
             <Item.Image size="tiny" />
             <Item.Content>
-              <Item.Header as={Link} to={`/teams/${team.id}`}>
-                {team.name}
+              <Item.Header as={Link} to={`/teams/${user.id}`}>
+                {user.displayName}
               </Item.Header>
             </Item.Content>
           </Item>
@@ -25,7 +25,7 @@ export default function UserListItem({ team }: Props) {
       <Segment clearing>
         <Button
           as={Link}
-          to={`/teams/${team.id}`}
+          to={`/users/${user.id}`}
           color="teal"
           floated="right"
           content="View"

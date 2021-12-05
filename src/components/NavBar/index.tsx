@@ -9,6 +9,7 @@ export default function NavBar() {
         <Menu.Item as={NavLink} to="/" exact header>
           team-player
         </Menu.Item>
+        <Menu.Item as={NavLink} to="/teams" name="teams" />
         <Menu.Item as={NavLink} to="/users" name="users" />
       </Container>
     </Menu>

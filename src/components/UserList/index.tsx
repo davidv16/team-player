@@ -1,24 +1,14 @@
-import React, { useState, Fragment, useEffect } from 'react';
-import ITeam from '../../models/ITeam';
-import dummyTeam from '../../resources/dummyTeam.json';
-import TeamListItem from '../TeamListItem';
-import * as teamService from '../../services/TeamService';
+import React from 'react';
+import { observer } from 'mobx-react-lite';
 import UserListItem from '../UserListItem';
+import { useStore } from '../../stores/store';
+import IUser from '../../models/IUser';
 
-export default function UserList() {
-  const [users, setUsers] = useState<ITeam[]>([]);
+interface Props {
+  users: IUser[];
+}
 
-  useEffect(() => {
-    (async () => {
-      teamService.getUsers().then((response) => {
-        const userImport: ITeam[] = [];
-        response.forEach((user) => {
-          userImport.push(user);
-        });
-        setUsers(userImport);
-      });
-    })();
-  }, []);
+function UserList({ users }: Props) {
   return (
     <>
       {users.map((user) => (
@@ -27,3 +17,5 @@ export default function UserList() {
     </>
   );
 }
+
+export default observer(UserList);
