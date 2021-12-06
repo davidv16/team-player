@@ -35,17 +35,18 @@ module.exports = {
     'react/jsx-filename-extension': [2, { extensions: ['.js', '.jsx', '.ts', '.tsx'] }],
     'no-use-before-define': 'off',
     'import/prefer-default-export': 'off',
-    '@typescript-eslint/no-use-before-define': ['error'],
+    // '@typescript-eslint/no-use-before-define': ['error'],
     '@typescript-eslint/explicit-module-boundary-types': 'off',
-    'react/style-prop-object': [1, { allow: ['string'] }],
-    'no-unused-vars': 'off',
-    'comma-dangle': 'off',
+    // 'react/style-prop-object': [1, { allow: ['string'] }],
+    // 'no-unused-vars': 'off',
+    // 'comma-dangle': 'off',
     'no-nested-ternary': 'off',
     semi: 'off',
-    '@typescript-eslint/semi': ['error'],
-    'arrow-body-style': 'off',
+    'no-extra-semi': 'off',
+    // '@typescript-eslint/semi': ['error'],
+    // 'arrow-body-style': 'off',
     'react/require-default-props': 'off',
-    'no-restricted-syntax': 'off',
+    // 'no-restricted-syntax': 'off',
     'import/extensions': [
       'error',
       'ignorePackages',
@@ -63,6 +64,6 @@ module.exports = {
         unnamedComponents: 'arrow-function',
       },
     ],
-    'object-curly-newline': 'off'
+    // 'object-curly-newline': 'off'
   },
 };

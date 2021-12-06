@@ -1,5 +1,4 @@
 import { makeAutoObservable, runInAction } from 'mobx';
-import { convertTypeAcquisitionFromJson } from 'typescript';
 import ITeam from '../models/ITeam';
 import ITeamDetail from '../models/ITeamDetail';
 import IUser from '../models/IUser';
@@ -7,182 +6,237 @@ import IUserDetail from '../models/IUserDetail';
 import services from '../services';
 
 export default class TeamUserStore {
+  // A list to store the teams
   teamRegistry = new Map<string, ITeam>();
+
+  // A list to store the users
   userRegistry = new Map<string, IUser>();
+
+  // A list to store the team members for the detailed user view
   teamMembers = new Map<string, IUser>();
 
+  // A variable to store the current team
   selectedTeam: ITeamDetail | undefined = undefined;
-  selectedUser: IUserDetail | undefined = undefined;
-  teamLeader: IUser | undefined = undefined;
-  // editMode = false;
-  // loading = false;
 
+  // A variable to store the current user
+  selectedUser: IUserDetail | undefined = undefined;
+
+  // A variable to store the team leader
+  teamLeader: IUser | undefined = undefined;
+
+  // Bool variable to turn the loading spinner off and on.
   loadingInitial = false;
 
   constructor() {
-    // this function is going to be used when this class is called
     makeAutoObservable(this);
   }
 
+  /**
+   * @function teamMembersSorted
+   * @return an Array of sorted team members
+   */
   get teamMembersSorted() {
     return Array.from(
-      this.teamMembers.values()
+      this.teamMembers.values(),
     ).sort(((a, b) => (
       (a.displayName > b.displayName) ? 1 : ((b.displayName > a.displayName) ? -1 : 0)
     )));
   }
+
+  /**
+   * @function teamsSorted
+   * @return an Array of sorted teams
+   */
   get teamsSorted() {
     return Array.from(
-      this.teamRegistry.values()
+      this.teamRegistry.values(),
     ).sort(((a, b) => (
       (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0)
     )));
   }
 
+  /**
+   * @function usersSorted
+   * @return an Array of sorted users
+   */
   get usersSorted() {
     return Array.from(
-      this.userRegistry.values()
+      this.userRegistry.values(),
     ).sort(((a, b) => (
       (a.displayName > b.displayName) ? 1 : ((b.displayName > a.displayName) ? -1 : 0)
     )));
   }
 
-  sortUser = (users: IUser[]) => {
-    return users.sort(((a, b) => (
-      (a.displayName > b.displayName) ? 1 : ((b.displayName > a.displayName) ? -1 : 0)
-    )));
-  }
-
+  /**
+   * @function loadUsers
+   * loads a list of users from the api to the user registry
+   */
   loadUsers = async () => {
-    // start loading symbol
+    // Start loading symbol.
     this.loadingInitial = true;
     try {
+      // Fetch the users from the api.
       const users = await services.Users.list();
 
       users.forEach((user) => {
         this.setUser(user);
       });
-      // turn of the loading
+      // Turn of the loading.
       this.setLoadingInitial(false);
     } catch (e) {
-      console.log(e);
-      // turn of the loading
+      // eslint-disable-next-line
+      console.error(e);
+      // Turn of the loading.
       this.setLoadingInitial(false);
     }
   };
 
-  // a function that gets a single user
+  /**
+   * @function loadUser
+   * Function that loads a single user from the api
+   * @param id
+   * @returns user
+   */
   loadUser = async (id: string) => {
+    // Fetches a single user from the api.
+    const user = await services.Users.details(id);
     try {
-      // and run the axios to get the single user from the api
-      let user = await services.Users.details(id);
-      // run the helper function to set the current user
-      // to the user map
+      // Run the helper function to set the current user to the user map.
       this.setUser(user);
-      // to avoid type script errors
+      // To avoid type script errors.
       runInAction(() => {
-        // set the user to the selected user
+        // Set the user to the selected user.
         this.selectedUser = user;
       });
-      // set the loading symbol to false
+      // Set the loading symbol to false.
       this.setLoadingInitial(false);
-      // ensures we return a promise that is either user or undefined
+      // Ensures we return a promise that is either user or undefined.
       return user;
     } catch (e) {
-      // otherwise catch the error.
-      console.log(e);
-      // set the loading symbol to false
+      // Otherwise catch the error.
+      // eslint-disable-next-line
+      console.error(e);
+      // Set the loading symbol to false.
       this.setLoadingInitial(false);
     }
+    return user;
   };
 
+  /**
+   * @function loadTeams
+   * Function to load a list of teams from the api
+   */
   loadTeams = async () => {
-    // start loading symbol
+    // Start loading symbol.
     this.loadingInitial = true;
     try {
+      // Fetches the teams from the api.
       const teams = await services.Teams.list();
-
+      // Runs through the list of teams and appends them to the team registry.
       teams.forEach((team) => {
         this.setTeam(team);
       });
-      // turn of the loading
+      // Turn of the loading.
       this.setLoadingInitial(false);
     } catch (e) {
-      console.log(e);
-      // turn of the loading
+      // eslint-disable-next-line
+      console.error(e);
+      // Turn of the loading.
       this.setLoadingInitial(false);
     }
   };
 
-  // a function that gets a single team
+  /**
+   * @function loadTeam
+   * Function that loads a single team from the api
+   * @param id
+   * @returns team
+   */
   loadTeam = async (id: string) => {
-    // checks if the current team exists
+    // Fetches a single team from the api.
     let team = await services.Teams.details(id);
-    // if team exists
+    // If team exists.
     if (team) {
-      // set the team to the selected team
+      // Set the team to the selected team.
       this.selectedTeam = team;
+      // Sets the team leader.
       this.teamLeader = this.getUser(team.teamLeadId);
+      // Sets the team members to a team member registry.
       this.setTeamMembers(team.teamMemberIds);
-      // ensures we return a promise that is either team or undefined
+      // Ensures we return a promise that is either team or undefined.
       return team;
     }
-    // otherwise start loading
+    // Otherwise start loading
     this.loadingInitial = true;
     try {
-      // and run the axios to get the single team from the api
+      // and run the axios to get the single team from the api.
       team = await services.Teams.details(id);
-      // run the helper function to set the current team
-      // to the team map
+      // Run the helper function to set the current team to the team map.
       this.setTeam(team);
-      // to avoid type script errors
+      // To avoid type script errors.
       runInAction(() => {
-        // set the team to the selected team
+        // Set the team to the selected team.
         this.selectedTeam = team;
+        // Sets the team leader.
         this.teamLeader = this.getUser(team.teamLeadId);
+        // Sets the team members to a team member registry.
         this.setTeamMembers(team.teamMemberIds);
       });
-      // set the loading symbol to false
+      // Set the loading symbol to false.
       this.setLoadingInitial(false);
-      // ensures we return a promise that is either team or undefined
     } catch (e) {
       // otherwise catch the error.
-      console.log(e);
-      // set the loading symbol to false
+      // eslint-disable-next-line
+      console.error(e);
+      // Set the loading symbol to false.
       this.setLoadingInitial(false);
     }
     return team as ITeamDetail;
   };
 
-
+  /**
+   * @function setTeamMembers
+   * Helper function that loops through the team member id's
+   * and writes the team members to the team member registry.
+   * @param ids
+   */
   private setTeamMembers = (ids: string[]) => {
     ids.forEach((id) => {
       this.teamMembers.set(id, this.getUser(id) as IUser);
     });
-  }
+  };
 
+  /**
+   * @function setUser
+   * Helper function to add a user to the user registry.
+   * @param user
+   */
   private setUser = (user: IUser) => {
     this.userRegistry.set(user.id, user);
   };
 
-  
-  private getUser = (id: string) => {
-    return this.userRegistry.get(id);
-  };
+  /**
+   * @function getUser
+   * Helper function to get a user from the user registry by id.
+   * @param id
+   * @returns
+   */
+  private getUser = (id: string) => this.userRegistry.get(id);
 
+  /**
+   * @function setTeam
+   * Helper function to add a team to the team registry.
+   * @param team
+   */
   private setTeam = (team: ITeam) => {
     this.teamRegistry.set(team.id, team);
   };
 
-  private setTeamMember = (user: IUser) => {
-    this.teamMembers.set(user.id, user);
-  }
-
-  private getTeam = (id: string) => {
-    return this.teamRegistry.get(id);
-  };
-
-  // action to turn the loading symbol on
+  /**
+   * @functon setLoadingInitial
+   * Function to set the loading spinner on or off.
+   * @param state
+   */
   setLoadingInitial = (state: boolean) => {
     this.loadingInitial = state;
   };

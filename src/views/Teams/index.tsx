@@ -7,11 +7,14 @@ import LoadingComponent from '../../components/Loading';
 
 function Teams() {
   const { teamUserStore } = useStore();
-  const { loadUsers, loadTeams, userRegistry, teamRegistry } = teamUserStore;
+  const {
+    loadUsers, loadTeams, userRegistry, teamRegistry,
+  } = teamUserStore;
 
   useEffect(() => {
-      if (teamRegistry.size <= 1) loadTeams();
-      if (userRegistry.size <= 1) loadUsers();
+    // checks if the teams and users are already loaded in the cache and loads them if they are not.
+    if (teamRegistry.size <= 1) loadTeams();
+    if (userRegistry.size <= 1) loadUsers();
   }, [teamRegistry.size, loadTeams, userRegistry.size, loadUsers]);
 
   // checks if the frontend is loading before it renders the Loading component

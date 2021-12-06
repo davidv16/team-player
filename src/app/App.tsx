@@ -1,16 +1,14 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import './App.css';
 import { Container } from 'semantic-ui-react';
 import { Route, Routes } from 'react-router-dom';
-import { observer } from 'mobx-react-lite';
 import Teams from '../views/Teams';
 import NavBar from '../components/NavBar';
 import Users from '../views/Users';
 import TeamDetail from '../views/TeamDetail';
-import { useStore } from '../stores/store';
 import UserDetail from '../views/UserDetail';
 
-function App() {
+export default function App() {
   return (
     <>
       <NavBar />
@@ -26,5 +24,3 @@ function App() {
     </>
   );
 }
-
-export default App;

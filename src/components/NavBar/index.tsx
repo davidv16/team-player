@@ -7,10 +7,10 @@ export default function NavBar() {
     <Menu inverted fixed="top">
       <Container>
         <Menu.Item as={NavLink} to="/" exact header>
-          team-player
+          Team Player
         </Menu.Item>
-        <Menu.Item as={NavLink} to="/teams" name="teams" />
-        <Menu.Item as={NavLink} to="/users" name="users" />
+        <Menu.Item as={NavLink} to="/teams" name="Teams" />
+        <Menu.Item as={NavLink} to="/users" name="Users" />
       </Container>
     </Menu>
   );
